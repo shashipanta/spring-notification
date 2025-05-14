@@ -1,4 +1,4 @@
-import { PROPERTY } from "$lib/api-routes";
+import { _PROPERTY, API_PREFIX, BASE_URL, PROPERTY } from "$lib/api-routes";
 import { error } from "@sveltejs/kit";
 import { fetchData } from "../../../../api.js";
 import propertyTypeStore, {
@@ -13,7 +13,8 @@ interface PropertyTypeSelect {
 /** @type {import('./$types').PageLoad} */
 export async function load({ params }) {
   let propertyTypeList: [string];
-  const propertyMetaInfo = await fetchData(PROPERTY + "/get-info");
+  console.log("PROPERTY.OWNER", PROPERTY.OWNER)
+  const propertyMetaInfo = await fetchData(PROPERTY.BASE + "/get-info");
 
   // get property Type form meta info response
   propertyTypeList = propertyMetaInfo.propertyType;

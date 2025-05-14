@@ -22,7 +22,6 @@
   ];
 
   onMount(() => {
-    const response = fetchData(PROPERTY);
     console.log("First : ", secondaryImages);
   });
 
@@ -39,5 +38,5 @@
 <Gallery class="grid gap-2" >
   <img src={featuredImg.src} alt={featuredImg.alt} class="h-auto max-w-full rounded-lg" />
   <GalleryRow imageInfos={secondaryImages} bind:featuredImgIndex={featuredImgIndex}
-  on:childValueChange={updateFeaturedImg(featuredImgIndex)}/>
+  on:childValueChange={() => updateFeaturedImg(featuredImgIndex)}/>
 </Gallery>

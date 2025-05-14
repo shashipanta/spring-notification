@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { API_USER_ACCOUNT_AUTH } from "$lib/api-routes.js";
 import { redirect } from "@sveltejs/kit";
+import toast from "svelte-french-toast";
 
 const loginSchema = z.object({
   username: z.string().min(1).max(150).trim(),
@@ -18,9 +19,20 @@ export const actions = {
       body: JSON.stringify(formData),
     });
 
+    // check if login was successful
+    if (!loginRes.ok) {
+      const errorData = await loginRes.json();
+      console.log("error data", errorData);
+      const errorMessage = errorData.message || "Login failed";
+     
+      throw redirect(302, `/login?message=${errorMessage}`);  
+    }
+
     let loginData = await loginRes.json();
     console.log("login data", loginData);
     const { accessToken, refreshToken } = loginData.data;
+
+
 
     // add to cookies
     cookies.set("accessToken", accessToken, {
@@ -39,7 +51,7 @@ export const actions = {
     if (redirectTo) {
       throw redirect(302, `/${redirectTo.slice(1)}`);
     } else {
-      throw redirect(302, "/");
+      throw redirect(302, "/api/dashboard");
     }
 
     return {

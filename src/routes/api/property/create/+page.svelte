@@ -42,7 +42,7 @@
 
     let propertyRequest: PropertyRegistrationRequest = {
       id: "", 
-      title: null,
+      propertyTitle: null,
       propertyType: null,
       allocatedPrice: null,
       pricePerUnit: null,
