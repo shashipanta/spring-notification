@@ -23,7 +23,7 @@ export const actions = {
     const { accessToken, refreshToken } = loginData.data;
 
     // add to cookies
-    cookies.set("accessToken", refreshToken, {
+    cookies.set("accessToken", accessToken, {
       path: "/",
       httpOnly: true,
       sameSite: "strict",
@@ -32,7 +32,7 @@ export const actions = {
     });
 
     // update locals to include authentication token: this is available in every load functions
-    locals.authToken = refreshToken;
+    locals.authToken = accessToken;
 
     const redirectTo = url.searchParams.get("redirectTo");
 

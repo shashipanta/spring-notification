@@ -11,6 +11,7 @@ let authToken = "authToken";
 
 const api = axios.create({
   baseURL: PUBLIC_SERVER_BASE_URL,
+  withCredentials: true,
 });
 
 function attachAuthHeader() {
@@ -26,11 +27,7 @@ export async function fetchData(endpoint: string) {
     console.log("Authorization header in common fetch function : ");
     // console.log("Request Body : ", fetch(endpoint));
     const response = await fetch(apiEndPoint, {
-      headers: {
-        "Content-Type": "application/json",
-        // Add your authorization header here
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhcnVuQHlvcG1haS5jb20iLCJpYXQiOjE3MDU1ODc4NzUsImV4cCI6MTcwNjQ1MTg3NX0.zc_Of0yJO7YK051919tetgvdRXMrE-ZEYZlsip0qCuI`,
-      },
+      credentials: "include",
     });
     const responseJson: GlobalApiResponse = await response.json();
 
