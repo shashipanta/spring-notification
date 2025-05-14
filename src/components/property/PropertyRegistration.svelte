@@ -106,7 +106,7 @@
         <div class="sm:col-span-2">
           <Label for="name" class="mb-2">Property Name</Label>
           <Input type="text" id="name" 
-          bind:value={propertyRequest.title}
+          bind:value={propertyRequest.propertyTitle}
           placeholder="Type property name" required />
         </div>
         <div class="w-full">

@@ -1,19 +1,14 @@
 <script lang="ts">
-  import { UserCircleSolid } from 'flowbite-svelte-icons';
-  import { Label, Select, Input, InputAddon, ButtonGroup, Helper } from 'flowbite-svelte';
-  import { Search, Button } from 'flowbite-svelte';
+
   import { onMount } from 'svelte';
   import { PROPERTY } from '$lib/api-routes.js';
   import { fetchData, postData } from '../../../../api.js';
-  import GenericModal from '../../../../components/Modal/GenericModal.svelte';
-  import { Checkbox } from 'flowbite-svelte';
-  import NumberGroups from '../../../../components/number/NumberGroups.svelte';
-  import CreatePropertyForm from '../../../../components/property/SideBarForm.svelte';
+
   import PropertyRegistration from '../../../../components/property/PropertyRegistration.svelte';
-  import GenericNumberGroups from '../../../../components/number/GenericNumberGroups.svelte';
+
   import propertyTypeStore from '$lib/custom-stores/property-stores.js';
   import type { PropertyRegistrationRequest } from '$lib/global-types/PropertyTypes.js';
-  import type { AxiosHeaders } from 'axios';
+
 
 
   let selected;
@@ -41,7 +36,7 @@
       name: '',
     }
     onMount(async() => {
-      const propertyData = fetchData(PROPERTY);
+      // const propertyData = fetchData(PROPERTY);
       propertyTypeList = $propertyTypeStore;
     })
 
@@ -75,12 +70,6 @@
 
     console.log("owner responses : ", ownerResponses);
   </script>
-  <!-- <GenericModal /> -->
-
-<!-- <pre>
-  {JSON.stringify(data.propertyMetaInfo.data.ownerResponses, null, 2)}
-</pre> -->
-
   
   <!--Create Property side form  -->
   <PropertyRegistration bind:propertyRequest={propertyRequest} />

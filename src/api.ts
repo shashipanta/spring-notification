@@ -93,10 +93,6 @@ export async function postDataMultipart(
     console.log("Data for post: ", data);
     const response: GlobalApiResponse = await api.post(apiEndPoint, data, {
       method: "POST",
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhcnVuQHlvcG1haS5jb20iLCJpYXQiOjE3MDU1ODc4NzUsImV4cCI6MTcwNjQ1MTg3NX0.zc_Of0yJO7YK051919tetgvdRXMrE-ZEYZlsip0qCuI`,
-      },
     });
     // handleToast(response.data);
     return response.data;

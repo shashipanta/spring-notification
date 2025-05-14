@@ -16,19 +16,6 @@
     rows: [[]],
   };
 
-  // let tableProps = {
-  //   titles: ["property Name", "Property Location", "Property Price", "Edit"],
-  //   rows:[
-  //     ["someName", "some-location", "$Price", "action"],
-  //     ["someName", "some-location", "$Price", "action"],
-  //     ["someName", "some-location", "$Price", "action"],
-  //     ["someName", "some-location", "$Price", "action"],
-  //     ["someName", "some-location", "$Price", "action"],
-  //     ["someName", "some-location", "$Price", "action"],
-  //     ["someName", "some-location", "$Price", "action"],
-  //     ["someName", "some-location", "$Price", "action"],
-  //   ]
-  // }
 
   onMount(() => {
     console.log("Property Information : ", data);

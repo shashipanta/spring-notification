@@ -27,7 +27,7 @@ let properties = [];
 
 export const load = async ({ fetch }) => {
   console.log("Fetthicn Product here");
-  let properties = await fetchData(PROPERTY);
+  let properties = await fetchData(PROPERTY + "/owner");
 
   console.log("Properties: ", properties);
 

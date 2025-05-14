@@ -9,7 +9,7 @@ export type PropertyTypeList = {
 
 export type PropertyRegistrationRequest = {
   id: number | "";
-  title: number | null;
+  propertyTitle: number | null;
   propertyType: string | null;
   allocatedPrice: number | null;
   pricePerUnit: number | null;
