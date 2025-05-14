@@ -6,7 +6,7 @@ export const API_PREFIX = "/api/v1/";
 // OWNER
 export const OWNER = BASE_URL + API_PREFIX + "owners/";
 
-// user accounts
+// user accounts: http://localhost:8090/api/v1/user-accounts/auth/{register, login}
 export const API_USER_ACCOUNT = BASE_URL + API_PREFIX + "user-accounts";
 export const API_USER_ACCOUNT_AUTH = API_USER_ACCOUNT + "/auth/";
 
