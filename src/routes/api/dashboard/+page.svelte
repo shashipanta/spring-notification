@@ -1,6 +1,5 @@
-
 <script>
-    import GreyBody from "../../../components/main/GreyBody.svelte";
+  import GreyBody from "../../../components/main/GreyBody.svelte";
 </script>
-  <!-- grey body  -->
-  <GreyBody />
+
+<GreyBody />

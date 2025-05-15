@@ -1,7 +1,6 @@
-import { z } from "zod";
-import { API_USER_ACCOUNT_AUTH } from "$lib/api-routes.js";
+import { API_USER_ACCOUNT_AUTH, USER_ACCOUNT } from "$lib/api-routes.js";
 import { redirect } from "@sveltejs/kit";
-import toast from "svelte-french-toast";
+import { z } from "zod";
 
 const loginSchema = z.object({
   username: z.string().min(1).max(150).trim(),
@@ -24,8 +23,8 @@ export const actions = {
       const errorData = await loginRes.json();
       console.log("error data", errorData);
       const errorMessage = errorData.message || "Login failed";
-     
-      throw redirect(302, `/login?message=${errorMessage}`);  
+
+      throw redirect(302, `/login?message=${errorMessage}`);
     }
 
     let loginData = await loginRes.json();
@@ -43,6 +42,7 @@ export const actions = {
       maxAge: 60 * 60 * 24 * 7,
     });
 
+
     // update locals to include authentication token: this is available in every load functions
     locals.authToken = accessToken;
 
@@ -53,14 +53,5 @@ export const actions = {
     } else {
       throw redirect(302, "/api/dashboard");
     }
-
-    return {
-      form: formData,
-    };
-  },
-
-  logout: async ({ cookies, locals }) => {
-    console.log("yoou are getting loggged out just now!");
-    console.log("LOCALS IN LOGOUT: ", locals.authToken);
   },
 };

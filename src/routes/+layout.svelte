@@ -1,23 +1,21 @@
 <script lang="ts">
-  import { apiResponse } from "$lib/service/ApiService";
   import { onMount } from "svelte";
+  import { Toaster } from "svelte-french-toast";
   import Toast from "../components/toast/Toast.svelte";
-  import GenericToast from "../components/toast/GenericToast.svelte";
-  import toast, {Toaster} from 'svelte-french-toast'
-  
+
   onMount(() => {
     // Simulate API response
     // Remove this in your actual usage
     // apiResponse.set({ success: true, message: 'Welcome to the app!' });
+    // when layout loads, set the user store
+    console.log("This is the layout file missing in middle");
   });
 </script>
 
-
 <Toaster />
 <div class="h-screen min-w-full">
-    <!-- render api message if api response gives decent message -->
-    <Toast {apiResponse} />
-    <GenericToast {apiResponse} />
-  
-    <slot />
+  <!-- render api message if api response gives decent message -->
+  <Toast />
+  <!-- <GenericToast prop={apiResponse} /> -->
+  <slot />
 </div>

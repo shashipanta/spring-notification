@@ -1,13 +1,11 @@
-// export function load({ locals }) {
-//   return {
-//     user:
-//       locals.authToken &&
-//       {
-//         // TODO: USER RELATED DATA FOR DASHBOARD
-//         // username: locals.user.username,
-//         // email: locals.user.email,
-//         // image: locals.user.image,
-//         // bio: locals.user.bio
-//       },
-//   };
-// }
+export function load({ locals }) {
+
+  console.log("========== /api/+layout.server.ts {method: load}: ", locals.user);
+  const user = JSON.parse(locals.user)
+  return {
+    user: {
+      username: user.username,
+      email: user.email,
+    }
+  }
+}

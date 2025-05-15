@@ -3,6 +3,13 @@ import { PUBLIC_SERVER_BASE_URL } from "$env/static/public";
 export const BASE_URL = PUBLIC_SERVER_BASE_URL;
 export const API_PREFIX = "/api/v1/";
 
+// USER-ACCOUNTS
+export const _USER_ACCOUNT = BASE_URL + API_PREFIX + "user-accounts/";
+export const USER_ACCOUNT = {
+    BASE: _USER_ACCOUNT,
+    DETAILS: _USER_ACCOUNT + "details",
+}
+
 // OWNER
 export const OWNER = BASE_URL + API_PREFIX + "owners/";
 

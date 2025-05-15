@@ -1,12 +1,16 @@
-import { redirect, type Handle } from "@sveltejs/kit";
-import { PUBLIC_SERVER_BASE_URL } from "$env/static/public";
-import { request } from "http";
+import { USER_ACCOUNT } from "$lib/api-routes";
 import { handleLoginRedirect } from "$lib/utils/routeUtils";
+import { redirect, type Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ resolve, event }) => {
   console.log("Event ", event.cookies.getAll());
 
   let accessTokenCookie = event.cookies.get("accessToken");
+  let userInfoCookie = event.cookies.get("userInfo");
+
+  // setting the token info for locals to access
+  event.locals.authToken = accessTokenCookie != null ? accessTokenCookie : "";
+  event.locals.user = userInfoCookie;
 
   if (accessTokenCookie != null) {
     event.request.headers.set("Authorization", `Bearer ${accessTokenCookie}`);
@@ -16,42 +20,36 @@ export const handle: Handle = async ({ resolve, event }) => {
 
   // const fromUrl = event.url.pathname + event.url.search;
 
+  // populate locals with user info
+  if (event.locals.user == null) {
+    console.info("========== Fetching user info from API ==========");
+    const userInfo = await fetch(USER_ACCOUNT.DETAILS, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessTokenCookie}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (userInfo.ok) {
+      const userInfoData = await userInfo.json();
+      const loggedUserInfo = {
+        username: userInfoData.data.username,
+        email: userInfoData.data.email,
+      }
+      event.locals.user = loggedUserInfo
+    }
+  }
+
+  console.log("User info from hook: ", event.locals.user);
+
+  console.info("========== HOOK.SERVER.TS is hooked to all routes");
+
   // // if no access token then redirect to login page
   if (event.url.pathname.startsWith("/api") && accessTokenCookie == null)
     throw redirect(303, handleLoginRedirect(event));
 
-  console.log("Hook is hooked!");
-
-  console.log(
-    "Authorization Header from h.s.ts : ",
-    event.request.headers.get("Authorization")
-  );
 
   const response = await resolve(event);
 
-  console.log(
-    "HEADER AFTER RESOLVE : ",
-    event.request.headers.get("Authorization")
-  );
-
   return response;
 };
-
-function getUserRoles(accessToken: string) {}
-
-// export const handleFetch = async ({ event, request, fetch }) => {
-//   console.log("Handle Fetch : ");
-//   if (request.url.startsWith("http://localhost:8090/api/v1")) {
-//     const authToken = event.cookies.get("accessToken");
-//     console.log("Access Token : ", authToken);
-//     request.headers.set("Authorization", `Bearer ${authToken}`);
-//     // Perform the actual fetch with the modified request
-//     const response = await fetch(request);
-
-//     // Process the response if needed
-
-//     return response;
-//   }
-
-//   return fetch(request);
-// };

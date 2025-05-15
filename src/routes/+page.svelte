@@ -1,15 +1,3 @@
 <script>
-
-
-  const toastProps = {
-    status: "failure",
-    message : "This is message",
-    code: "400"
-  }
-
+    console.log("/api/+page.svelte file loaded");
 </script>
-
-
-
-<!-- TOAST -->
-<!-- <GenericToast props = {toastProps}/> -->
