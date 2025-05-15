@@ -2,10 +2,8 @@
   import { user } from "$lib/custom-stores/UserInfo-store";
   import Brand from "../brand/Brand.svelte";
 
-  export let loggedInUserInfo;
-
-  console.log("++++++++++ TopNavBar.svelte ++++++++++");
-  let userInfo = loggedInUserInfo.user;;
+  console.log("++++++++++ TopNavBar.svelte ++++++++++", $user);
+  let userInfo = $user;
 </script>
 
 <nav

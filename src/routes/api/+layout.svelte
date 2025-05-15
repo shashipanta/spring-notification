@@ -16,7 +16,7 @@
 </script>
 
 <!-- top navigation bar -->
-<TopNavBar loggedInUserInfo={data} />
+<TopNavBar />
 
 <!-- main-body-container -->
 <div class="p-4 sm:ml-64">
