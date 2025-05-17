@@ -20,8 +20,8 @@ export const handle: Handle = async ({ resolve, event }) => {
 
   // const fromUrl = event.url.pathname + event.url.search;
 
-  // populate locals with user info
-  if (event.locals.user == null) {
+  // populate locals with user info if user is logged in 
+  if (event.locals.user == null && accessTokenCookie != null) {
     console.info("========== Fetching user info from API ==========");
     const userInfo = await fetch(USER_ACCOUNT.DETAILS, {
       method: "GET",
