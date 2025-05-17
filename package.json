@@ -33,6 +33,7 @@
     "sockjs-client": "^1.6.1",
     "stompjs": "^2.3.3",
     "svelte-french-toast": "^1.2.0",
+    "svelte-icons": "^2.1.0",
     "tailwind-merge": "^2.1.0",
     "zod": "^3.22.4"
   }

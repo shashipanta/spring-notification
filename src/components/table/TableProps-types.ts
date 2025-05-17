@@ -1,4 +1,6 @@
+
 export type TableProps = {
-  titles: [string];
-  rows: [[]];
+  titles: string[];
+  rows: (string | number | boolean | null)[][];
+  hiddenColumns?: string[];
 };

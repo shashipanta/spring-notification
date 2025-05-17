@@ -1,75 +1,53 @@
 <script lang="ts">
-  import { Button, Spinner } from 'flowbite-svelte';
- 
-  import { onMount } from "svelte";
+  import { Button } from "flowbite-svelte";
   import Table from "../../../components/table/Table.svelte";
-  import type {TableProps} from "./../../../components/table/TableProps-types"
+  import type { TableProps } from "./../../../components/table/TableProps-types";
 
- 
-
-  export let properties = [];
   export let data;
 
-  console.log("length : ", properties.length);
   let tableProps: TableProps = {
     titles: [],
     rows: [[]],
+    hiddenColumns: []
   };
 
-
-  onMount(() => {
-    console.log("Property Information : ", data);
+  $: if (data?.properties) {
     tableProps = createTableProps(data.properties);
-    console.log("Table Props : => ", data.properties)
-  })
-  
-  function createTableProps(data: any) {
-
-    let titleArr: [string] = [""];
-    let finalRowArr = [[]];
-
-    for(let i=0; i<data.length; i++) {
-
-      let rowArr: any =[];
-
-      console.log("Element : ", data[i]);
-      console.log("Data : ", data);
-
-      rowArr.push(data[i].id);
-      rowArr.push(data[i].propertyCode);
-      rowArr.push(data[i].propertyType);
-      rowArr.push(data[i].allocatedPrice);
-      rowArr.push(data[i].pricePerUnit);
-      rowArr.push(data[i].dynamicPrice);
-      rowArr.push(data[i].occupied);
-      rowArr.push(data[i].createdOn);
-
-      finalRowArr.push(rowArr);
-    }
-
-    titleArr.push("property_Code");
-    titleArr.push("property_Type");
-    titleArr.push("allocated_Price");
-    titleArr.push("price_Per_Unit");
-    titleArr.push("dynamic_Price");
-    titleArr.push("occupied");
-    titleArr.push("created_On");
-
-    console.log("Title Arr", titleArr);
-    console.log("rowArr", finalRowArr);
-    
-
-    let tp: TableProps = {
-      titles: titleArr,
-      rows: finalRowArr
-    }
-
-    return tp;
+    console.log("Updated tableProps:", tableProps);
   }
 
+  function createTableProps(data: any): TableProps {
+    const titles: string[] = [
+      "sn",
+      "property_Code",
+      "property_Type",
+      "allocated_Price",
+      "price_Per_Unit",
+      "dynamic_Price",
+      "occupied",
+      "created_On",
+      "id", 
+      "actions"
+    ];
 
+    const rows = data.map((item: any, i: number) => [
+      i + 1,
+      item.propertyCode,
+      item.propertyType,
+      item.allocatedPrice,
+      item.pricePerUnit,
+      item.dynamicPrice,
+      item.occupied,
+      item.createdOn,
+      item.id,
+    ]);
+    const hiddenColumns = ["id"]
+
+    return { titles, rows, hiddenColumns };
+  }
 </script>
-<Button href="/api/property/create">Register Property</Button>
-<!-- Property table -->
 
-<Table tableProps={tableProps}/>
+<div class="container">
+  <Button href="/api/property/create">Register Property</Button>
+  <Table {tableProps} />
+</div>
