@@ -11,6 +11,8 @@
 
     import { ExclamationCircleOutline } from "flowbite-svelte-icons";
     import { slide } from "svelte/transition";
+    import ActionButton from "../buttons/ActionButton.svelte";
+    import { buildApiRoute, PROPERTY } from "$lib/api-routes";
 
     let popupModal = false;
 
@@ -27,10 +29,8 @@
     function handleView(id: string) {
         goto(`/api/property/${id}/view`);
     }
-    
-    function handleDeleteConfirmed(id: string) {
-        
-    }
+
+    function handleDeleteConfirmed(id: string) {}
 </script>
 
 <div class="relative overflow-x-auto shadow-md sm:rounded-lg" {tableProps}>
@@ -117,6 +117,22 @@
                             class="w-5 h-5 cursor-pointer text-red-600 hover:text-red-700"
                             on:click={() => (popupModal = true)}
                         />
+
+                        <ActionButton
+                            actionConfig={{
+                                action: "delete",
+                                id: String(
+                                    row[tableProps.titles.indexOf("id")],
+                                ),
+                                url: buildApiRoute(PROPERTY.DELETE, {id: row[tableProps.titles.indexOf("id")]}), // Pass URL dynamically
+                                confirmationMessage:
+                                    "Are you sure you want to delete this property?",
+                                successMessage:
+                                    "Property deleted successfully!",
+                                failureMessage: "Failed to delete property",
+                                withConfirmation: true, // Show confirmation modal
+                            }}
+                        />
                     </td>
                 </tr>
             {/each}
@@ -139,7 +155,9 @@
         >
             There is no way back!!
         </span>
-        <Button color="red" class="me-2" on:click={handleDeleteConfirmed}>Yes, I'm sure</Button>
+        <Button color="red" class="me-2" on:click={handleDeleteConfirmed}
+            >Yes, I'm sure</Button
+        >
         <Button color="alternative">No, cancel</Button>
     </div>
 </Modal>
