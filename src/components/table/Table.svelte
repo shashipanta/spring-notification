@@ -13,6 +13,7 @@
     import { slide } from "svelte/transition";
     import ActionButton from "../buttons/ActionButton.svelte";
     import { buildApiRoute, PROPERTY } from "$lib/api-routes";
+    import { ActionType } from "$lib/global-types/ActionTypes";
 
     let popupModal = false;
 
@@ -120,11 +121,11 @@
 
                         <ActionButton
                             actionConfig={{
-                                action: "delete",
+                                action: ActionType.DELETE,
                                 id: String(
                                     row[tableProps.titles.indexOf("id")],
                                 ),
-                                url: buildApiRoute(PROPERTY.DELETE, {id: row[tableProps.titles.indexOf("id")]}), // Pass URL dynamically
+                                url: buildApiRoute(PROPERTY.DELETE, {id: row[tableProps.titles.indexOf("id")] }), // Pass URL dynamically
                                 confirmationMessage:
                                     "Are you sure you want to delete this property?",
                                 successMessage:
