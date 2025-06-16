@@ -1,10 +1,22 @@
 <script lang="ts">
   import { Gallery } from 'flowbite-svelte';
   import { onMount } from 'svelte';
-  import { fetchData } from '../../api';
-  import { PROPERTY } from '$lib/api-routes';
   import GalleryRow from './GalleryRow.svelte';
-  import type { GalleryProps } from './GalleryRow-types';
+
+  interface GalleryProp {
+    featuredImage: {
+      alt: string;
+      src: string;
+    };
+    secondaryImages: {
+      alt: string;
+      src: string;
+    }[];
+  }
+
+ export let featuredGalleryProp: GalleryProp;
+  
+  
 
   let featuredImg = {
     alt: 'watch',
@@ -23,12 +35,23 @@
 
   onMount(() => {
     console.log("First : ", secondaryImages);
+    console.log("Props passed from parent: ", featuredGalleryProp);
+    if (featuredGalleryProp != undefined || featuredGalleryProp != null) {
+      console.error("featuredGalleryProp is undefined or null");
+      featuredImg = featuredGalleryProp.featuredImage;
+      secondaryImages = featuredGalleryProp.secondaryImages;
+      console.log("Featured Image : ", featuredImg);
+      console.log("Secondary Images : ", secondaryImages);
+    }
   });
 
   function updateFeaturedImg(index: number) {
     console.log("Secondary Image previously : ", secondaryImages)
     console.log("Image : ", index)
-    const imgToReplace : GalleryProps= secondaryImages[index];
+    const imgToReplace : GalleryProps = {
+      src : secondaryImages[index],
+      alt : secondaryImages[index].alt
+    };
     secondaryImages[index] = featuredImg;
     featuredImg = imgToReplace;
     console.log("Secondary Image after : ", secondaryImages);
