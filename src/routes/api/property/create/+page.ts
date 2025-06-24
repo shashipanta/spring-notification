@@ -1,9 +1,10 @@
-import { _PROPERTY, API_PREFIX, BASE_URL, PROPERTY } from "$lib/api-routes";
-import { error } from "@sveltejs/kit";
-import { fetchData } from "../../../../api.js";
-import propertyTypeStore, {
+import { buildApiRoute, PROPERTY } from "$lib/api-routes";
+import {
   createPropertyTypeStore,
 } from "$lib/custom-stores/property-stores.js";
+import { error } from "@sveltejs/kit";
+import { fetchData } from "../../../../api.js";
+import { P } from "flowbite-svelte";
 
 interface PropertyTypeSelect {
   value: string;
@@ -11,7 +12,7 @@ interface PropertyTypeSelect {
 }
 
 /** @type {import('./$types').PageLoad} */
-export async function load({ params }) {
+export async function load({ params, url }) {
   let propertyTypeList: [string];
   console.log("PROPERTY.OWNER", PROPERTY.OWNER)
   const propertyMetaInfo = await fetchData(PROPERTY.BASE + "/get-info");
@@ -25,6 +26,19 @@ export async function load({ params }) {
   console.log("PropertyType", propertyTypeList);
 
   ptStore.setPropertyType(propertyTypeList);
+
+  // get property id from url if present
+
+  if (url.searchParams.has("id")) {
+    const propertyId = url.searchParams.get("id");
+    if (propertyId) {
+      // fetch property data using the property id
+      console.log("THIS IS ID  ==> :", propertyId);
+      const url = buildApiRoute(PROPERTY.VIEW, { id: propertyId });
+      const propertyData = await fetchData(url);
+      return { propertyMetaInfo, propertyData };
+    }
+  }
 
   return { propertyMetaInfo };
 

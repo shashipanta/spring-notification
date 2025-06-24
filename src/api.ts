@@ -43,44 +43,6 @@ export async function fetchData(endpoint: string) {
   }
 }
 
-export const handleFetch = async ({ event, request, fetch }) => {
-  console.log("Handle Fetch : ");
-  if (request.url.startsWith("http://localhost:8090/api/v1")) {
-    const authToken = event.cookies.get("accessToken");
-    console.log("Access Token : ", authToken);
-    request.headers.set("Authorization", `Bearer ${authToken}`);
-    // Perform the actual fetch with the modified request
-    const response = await fetch(request);
-
-    // Process the response if needed
-
-    return response;
-  }
-
-  return fetch(request);
-};
-
-export async function postData(endpoint: string, data: any, headers: any) {
-  console.log("header ", headers);
-  const apiEndPoint = endpoint;
-  try {
-    console.log("Data for post: ", data);
-    const response: GlobalApiResponse = await api.post(apiEndPoint, data, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhcnVuQHlvcG1haS5jb20iLCJpYXQiOjE3MDU1ODc4NzUsImV4cCI6MTcwNjQ1MTg3NX0.zc_Of0yJO7YK051919tetgvdRXMrE-ZEYZlsip0qCuI`,
-      },
-    });
-    // handleToast(response.data);
-    return response.data;
-  } catch (error) {
-    // if error then it might be wrapped in axios so
-    toast.error(error.response.data.message);
-    handleToast(error.response.data);
-    // throw error;
-  }
-}
 
 export async function postDataMultipart(
   endpoint: string,
@@ -98,8 +60,8 @@ export async function postDataMultipart(
     return response.data;
   } catch (error) {
     // if error then it might be wrapped in axios so
-    toast.error(error.response.data.message);
-    handleToast(error.response.data);
+    // toast.error(error.response.data.message);
+    // handleToast(error.response.data);
     // throw error;
   }
 }

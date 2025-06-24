@@ -26,7 +26,7 @@ export const PROPERTY = {
     UPDATE: _PROPERTY + "/:{id}",
     DELETE: _PROPERTY + "/:{id}",
     GET_INFO: _PROPERTY + "/get-info/:{id}",
-    VIEW: _PROPERTY + "/get/:{id}/view",
+    VIEW: _PROPERTY + "/get/:{id}",
     OWNER: _PROPERTY + "/owner",
 }
 

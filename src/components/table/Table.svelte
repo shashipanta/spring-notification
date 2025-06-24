@@ -21,16 +21,15 @@
     });
 
     function handleEdit(id: string) {
-        console.log("Edit clicked for ID:", id);
+        console.log("Edit property with id : ", id);
         // Add your edit logic here
+        goto(`/api/property/create?id=${id}`);
     }
     function handleView(id: string) {
         goto(`/api/property/${id}/view`);
     }
-    
-    function handleDeleteConfirmed(id: string) {
-        
-    }
+
+    function handleDeleteConfirmed(id: string) {}
 </script>
 
 <div class="relative overflow-x-auto shadow-md sm:rounded-lg" {tableProps}>
@@ -91,6 +90,12 @@
                         <EditOutline
                             id="editIcon"
                             class="w-5 h-5 cursor-pointer hover:text-gray-700"
+                            on:click={() =>
+                                handleEdit(
+                                    String(
+                                        row[tableProps.titles.indexOf("id")],
+                                    ),
+                                )}
                         />
 
                         <!-- View Icon -->
@@ -139,7 +144,9 @@
         >
             There is no way back!!
         </span>
-        <Button color="red" class="me-2" on:click={handleDeleteConfirmed}>Yes, I'm sure</Button>
+        <Button color="red" class="me-2" on:click={handleDeleteConfirmed}
+            >Yes, I'm sure</Button
+        >
         <Button color="alternative">No, cancel</Button>
     </div>
 </Modal>

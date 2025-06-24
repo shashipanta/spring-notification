@@ -1,13 +1,6 @@
 import { PROPERTY } from "$lib/api-routes";
 import { fetchData } from "../../../api.js";
 
-/** @type {import('./$types').PageServerLoad} */
-// export async function load({ fetch }) {
-//   let data = fetch(PROPERTY);
-//   let products = data.then((x) => x.json());
-//   console.log("JSON", products);
-//   return { products: products.data };
-// }
 
 interface GlobalApiResponse {
   message: string;
@@ -35,3 +28,5 @@ export const load = async ({ fetch }) => {
     properties: properties != null ? properties : [],
   };
 };
+
+

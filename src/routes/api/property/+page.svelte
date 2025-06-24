@@ -2,19 +2,22 @@
   import { Button } from "flowbite-svelte";
   import Table from "../../../components/table/Table.svelte";
   import type { TableProps } from "./../../../components/table/TableProps-types";
+  import { page } from "$app/stores";
+  import { onMount } from "svelte";
 
   export let data;
 
   let tableProps: TableProps = {
     titles: [],
     rows: [[]],
-    hiddenColumns: []
+    hiddenColumns: [],
   };
 
   $: if (data?.properties) {
     tableProps = createTableProps(data.properties);
     console.log("Updated tableProps:", tableProps);
   }
+
 
   function createTableProps(data: any): TableProps {
     const titles: string[] = [
@@ -26,8 +29,8 @@
       "dynamic_Price",
       "occupied",
       "created_On",
-      "id", 
-      "actions"
+      "id",
+      "actions",
     ];
 
     const rows = data.map((item: any, i: number) => [
@@ -41,7 +44,7 @@
       item.createdOn,
       item.id,
     ]);
-    const hiddenColumns = ["id"]
+    const hiddenColumns = ["id"];
 
     return { titles, rows, hiddenColumns };
   }
