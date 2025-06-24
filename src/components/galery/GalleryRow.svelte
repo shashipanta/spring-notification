@@ -1,10 +1,10 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from "svelte";
-  import type { GalleryProps } from "./GalleryRow-types";
+  import type { SingleImageProp } from "./Gallery-types";
 
 
-    export let imageInfos: GalleryProps;
-    export let featuredImgIndex: number;
+  export let imageInfos: SingleImageProp[];
+  export let featuredImgIndex: number;
 
   function updateFeaturedImage(index: number) {
     featuredImgIndex = index;
@@ -25,11 +25,20 @@
 
 </script>
 
-<div class="grid grid-cols-5 gap-2">
-    {#each imageInfos as info, index}
-        <img class="h-auto max-w-full rounded-lg cursor-pointer" 
-        on:click={e => updateFeaturedImage(index)}
-        src={info.src} alt={info.alt}>
-    {/each}
-    
+<div class="grid grid-cols-5 gap-2 place-items-center">
+  
+  {#each imageInfos as info, index}
+    <button
+      class="w-[100px] h-[100px] p-0 border-none bg-transparent cursor-pointer overflow-hidden"
+      type="button"
+      on:click={() => updateFeaturedImage(index)}
+      aria-label={`Select image ${info.alt}`}
+    >
+      <img
+        class="w-full h-full object-cover block rounded-lg"
+        src={info.src}
+        alt={info.alt}
+      />
+    </button>
+  {/each}
 </div>

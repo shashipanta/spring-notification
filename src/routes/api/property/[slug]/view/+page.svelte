@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { onMount } from "svelte";
-	import { Skeleton } from "flowbite-svelte";
-	import FeaturedPropertyGallery from "../../../../../components/galery/FeaturedPropertyGallery.svelte";
 	import { buildApiRoute, PROPERTY } from "$lib/api-routes";
+	import { Skeleton } from "flowbite-svelte";
+	import { onMount } from "svelte";
+	import FeaturedPropertyGallery from "../../../../../components/galery/FeaturedPropertyGallery.svelte";
 
 	export let data; // the input data containing propertyId
 
@@ -21,9 +21,9 @@
 	}
 
 	function transformToGalleryProp(rawData: any): GalleryProp {
-  const baseUrl = 'http://localhost:8090/api/v1/properties/get-image/';
+  	const baseUrl = 'http://localhost:8090/api/v1/properties/get-image/';
 
-  console.log("Raw data received:", rawData);
+  	console.log("Raw data received:", rawData);
 
   return {
     featuredImage: {
@@ -50,7 +50,7 @@
 	{#if apiData}
 		<div class="grid grid-cols-2">
 			<FeaturedPropertyGallery featuredGalleryProp={transformToGalleryProp(apiData.data[0])} />
-			<pre>{JSON.stringify(apiData, null, 2)}</pre>
+			<pre class="max-h-[600px] overflow-auto text-sm bg-gray-100 p-2 rounded">{JSON.stringify(apiData, null, 2)}</pre>
 		</div>
 	{:else}
 		<p>No data found.</p>
