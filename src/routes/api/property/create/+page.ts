@@ -1,4 +1,4 @@
-import { buildApiRoute, PROPERTY } from "$lib/api-routes";
+import { PROPERTY } from "$lib/api-routes";
 import {
   createPropertyTypeStore,
 } from "$lib/custom-stores/property-stores.js";
@@ -34,7 +34,7 @@ export async function load({ params, url }) {
     if (propertyId) {
       // fetch property data using the property id
       console.log("THIS IS ID  ==> :", propertyId);
-      const url = buildApiRoute(PROPERTY.VIEW, { id: propertyId });
+      const url = PROPERTY.VIEW({ id: propertyId });
       const propertyData = await fetchData(url);
       return { propertyMetaInfo, propertyData };
     }

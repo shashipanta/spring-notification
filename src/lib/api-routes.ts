@@ -1,4 +1,5 @@
 import { PUBLIC_SERVER_BASE_URL } from "$env/static/public";
+import { routeBuilder } from "./utils/typed-routes";
 
 export const BASE_URL = PUBLIC_SERVER_BASE_URL;
 export const API_PREFIX = "/api/v1/";
@@ -23,22 +24,17 @@ export const PROPERTY = {
     BASE: _PROPERTY,
     GET: _PROPERTY ,
     CREATE: _PROPERTY ,
-    UPDATE: _PROPERTY + "/:{id}",
-    DELETE: _PROPERTY + "/:{id}",
-    GET_INFO: _PROPERTY + "/get-info/:{id}",
-    VIEW: _PROPERTY + "/get/:{id}",
     OWNER: _PROPERTY + "/owner",
+
+    UPDATE: routeBuilder(`${_PROPERTY }/:{id}`),
+    DELETE: _PROPERTY + "/:{id}",
+    GET_INFO: routeBuilder(`${_PROPERTY}/get-info/:{id}`),
+    VIEW: routeBuilder(`${_PROPERTY}/get/:{id}`),
+
+    // 🧠 Type-safe route builders
+    GET_IMAGE: routeBuilder(`${_PROPERTY}/get-image/:{imageFilename}`),
 }
 
-// UTILITY FUNCTION TO BUILD URL
-export function buildApiRoute<T extends string>(
-  route: T, 
-  params: Record<string, string>
-): string {
-  return route.replace(/:{([a-zA-Z]+)}/g, (_, key) => {
-    const value = params[key];
-    if (!value) throw new Error(`Missing parameter: ${key}`);
-    return value;
-  });
-}
+
+
 

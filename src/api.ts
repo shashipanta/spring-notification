@@ -1,7 +1,7 @@
 import { PUBLIC_SERVER_BASE_URL } from "$env/static/public";
 import type { GlobalApiResponse } from "$lib/api";
 import toast from "svelte-french-toast";
-import axios from "axios";
+import axios, { AxiosRequestHeaders, Method } from "axios";
 import type { Load } from "@sveltejs/kit";
 import type { Cookies } from "@sveltejs/kit";
 import { API_PREFIX, BASE_URL } from "$lib/api-routes";
@@ -14,11 +14,6 @@ const api = axios.create({
   withCredentials: true,
 });
 
-function attachAuthHeader() {
-  return {
-    Authorization: `Bearer ${authToken}`,
-  };
-}
 
 export async function fetchData(endpoint: string) {
   const apiEndPoint = endpoint;
@@ -66,21 +61,33 @@ export async function postDataMultipart(
   }
 }
 
-function handleToast(response: GlobalApiResponse) {
-  console.log("handle toast: ", response);
-  if (response === undefined) return;
-  let resStatus: string = response?.status.toUpperCase();
+export async function requestDataMultipart<T extends { message?: string } = any>(
+  method: Method,
+  endpoint: string,
+  data: any,
+  headers?: AxiosRequestHeaders
+): Promise<T> {
+  try {
+    console.log(`HTTP ${method} to ${endpoint} with data:`, data);
 
-  switch (resStatus) {
-    case "FAILURE":
-      toast.error(response.message);
-      break;
-    case "SUCCESS":
-      console.log("successful person ", response.message);
-      toast.success(response.message);
-      break;
-    default:
-      toast.error(response.status);
-      break;
+    const response = await axios.request<T>({
+      url: endpoint,
+      method,
+      data,
+      headers,
+      withCredentials: true,
+    });
+
+    toast.success((response.data as { message?: string })?.message || 'Operation successful');
+
+    return response.data;
+  } catch (error: any) {
+    const errorMessage =
+      error?.response?.data?.message || error.message || 'Something went wrong';
+
+    toast.error(errorMessage);
+
+    throw error;
   }
 }
+

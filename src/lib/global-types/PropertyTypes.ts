@@ -51,4 +51,5 @@ export type FileType = {
   name: string;
   thumbnail: string;
   file: File;
+  source: "remote" | "local";
 };

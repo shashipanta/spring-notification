@@ -19,10 +19,12 @@
   import GenericNumberGroups from "../number/GenericNumberGroups.svelte";
   import { Section } from "flowbite-svelte-blocks";
   import { onMount } from "svelte";
-  import { postDataMultipart } from "../../api";
+  import { postDataMultipart, requestDataMultipart } from "../../api";
   import { PROPERTY } from "$lib/api-routes";
+  import { AxiosHeaders } from "axios";
 
   export let propertyRequest: PropertyRegistrationRequest;
+  export let selectedFiles: FileType[] = [];
 
   async function handleSubmit() {
     console.log("Your Form : ", propertyRequest);
@@ -34,11 +36,20 @@
 
     let propertyRequestFormData = objectToFormData(propertyRequest);
 
-    console.log("Form Data ", propertyRequestFormData);
+    let axiosMultipartHeader = new AxiosHeaders({
+      "Content-Type": "multipart/form-data",
+    });
     let multipartHeader = { "Content-Type": "multipart/form-data" };
+
     // Append files to FormData
     propertyRequest.imageFiles.forEach((fileType, index) => {
-      propertyRequestFormData.append(`multipartFiles[${index}]`, fileType.file);
+      // if new file is added add it to request for files tagged with "remote" source it's already persisted
+      if (fileType.source === "local") {
+        propertyRequestFormData.append(
+          `multipartFiles[${index}]`,
+          fileType.file,
+        );
+      }
     });
     console.log("With Multipart File : ", propertyRequestFormData);
 
@@ -47,11 +58,27 @@
     console.log("With Multipart File : ", propertyRequestFormData);
     console.log("After deleting Multipart File : ", propertyRequestFormData);
 
-    const response = await postDataMultipart(
-      PROPERTY.CREATE,
-      propertyRequestFormData,
-      multipartHeader,
-    );
+    // conditionally call different API endpoints based on the request type
+    // For example, if you have a id then it's an update request
+    let response;
+    if (propertyRequest.id) {
+      // Call update API endpoint
+      console.log("Update request for property with ID: ", propertyRequest.id);
+      // You can implement the update logic here
+      response = await requestDataMultipart(
+        "PUT",
+        PROPERTY.UPDATE({ id: propertyRequest.id }),
+        propertyRequestFormData,
+        axiosMultipartHeader,
+      );
+    } else {
+      response = await postDataMultipart(
+        PROPERTY.CREATE,
+        propertyRequestFormData,
+        multipartHeader,
+      );
+    }
+
     console.log(response);
   }
 
@@ -79,8 +106,6 @@
     multiple: "multiple",
   };
 
-  let selectedFiles: FileType[] = [];
-
   let multipartFiles: File[] = [];
 
   const handleFileChange = (event: Event) => {
@@ -93,6 +118,7 @@
         name: file.name,
         thumbnail: URL.createObjectURL(file),
         file: file,
+        source: "local", // Indicating that this file is newly uploaded
       }));
       console.log("Files : ", files);
       // for backend
