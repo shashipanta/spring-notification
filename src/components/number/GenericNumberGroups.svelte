@@ -1,15 +1,21 @@
 <script lang="ts">
-    import type {
-        PropertyRegistrationRequest
-    } from "$lib/global-types/PropertyTypes";
+    import type { PropertyRegistrationRequest } from "$lib/global-types/PropertyTypes";
 
     export let propertyRequest: PropertyRegistrationRequest;
-    
-    let totalBathRooms = 0;
-    let totalBedRooms = 0;
-    let totalLivingRooms = 0;
-    let totalExternalBathRooms = 0;
-    let value = 0;
+
+    const roomKeyMap: Record<string, keyof typeof roomInfo> = {
+        "Living Rooms": "livingRooms",
+        "Bed Rooms": "bedRooms",
+        "Bath Rooms": "bathRooms",
+        "External BathRooms": "externalBathRooms",
+    };
+
+    type RoomInfo = {
+        bathRooms: number;
+        bedRooms: number;
+        livingRooms: number;
+        externalBathRooms: number;
+    }
 
     let buttonConfig = [
         {
@@ -38,6 +44,13 @@
         },
     ];
 
+    let roomInfo: RoomInfo = {
+        bathRooms: buttonConfig[0].defaultCount,
+        bedRooms: buttonConfig[1].defaultCount,
+        livingRooms: buttonConfig[2].defaultCount,
+        externalBathRooms: buttonConfig[3].defaultCount,
+    };
+
     // determine input type and assign right value to the request object
     /**
      *
@@ -46,46 +59,68 @@
      * action {i, d, o} i: increase, d: decrease, o: direct input field changed
      */
     function determineRoomType(roomType: string, action: string) {
-        console.log("value passed : ", roomType, " action: ", action, " Current Value: ", value);
+        console.log(
+            "value passed : ",
+            roomType,
+            " action: ",
+            action,
+            "Room Info: ",
+            roomInfo,
+        );
         switch (roomType) {
             case "Living Rooms":
-                totalLivingRooms =
-                    action == "i" ? totalLivingRooms + 1 : totalLivingRooms - 1;
-                propertyRequest.totalLivingRooms = totalLivingRooms;
+
+                roomInfo.livingRooms =
+                    action == "i"
+                        ? roomInfo.livingRooms + 1
+                        : roomInfo.livingRooms - 1;
+                propertyRequest.totalLivingRooms = roomInfo.livingRooms;
+                console.log(
+                    "Living rooms updated : ",
+                    roomInfo,
+                    "Property Request: ",
+                    propertyRequest,
+                );
                 break;
             case "Bed Rooms":
-                totalBedRooms =
-                    action == "i" ? totalBedRooms + 1 : totalBedRooms - 1;
-                propertyRequest.totalBedRooms = totalBedRooms;
+                roomInfo.bedRooms =
+                    action == "i"
+                        ? roomInfo.bedRooms + 1
+                        : roomInfo.bedRooms - 1;
+                propertyRequest.totalBedRooms = roomInfo.bedRooms;
                 break;
             case "Bath Rooms":
-                totalBathRooms =
-                    action == "i" ? totalBathRooms + 1 : totalBathRooms - 1;
-                propertyRequest.totalBathRooms = totalBathRooms;
+                roomInfo.bathRooms =
+                    action == "i"
+                        ? roomInfo.bathRooms + 1
+                        : roomInfo.bathRooms - 1;
+                propertyRequest.totalBathRooms = roomInfo.bathRooms;
                 break;
             case "External BathRooms":
-                totalExternalBathRooms =
+                roomInfo.externalBathRooms =
                     action == "i"
-                        ? totalExternalBathRooms + 1
-                        : totalExternalBathRooms - 1;
-                propertyRequest.totalExternalBathRooms = totalExternalBathRooms;
+                        ? roomInfo.externalBathRooms + 1
+                        : roomInfo.externalBathRooms - 1;
+                propertyRequest.totalExternalBathRooms =
+                    roomInfo.externalBathRooms;
                 break;
         }
     }
 
     function setRoomNumberBasedOnType(roomType: string, changedVal: number) {
+        const value = parseInt(changedVal.toString(), 10);
         switch (roomType) {
             case "Living Rooms":
-                propertyRequest.totalLivingRooms = changedVal;
+                propertyRequest.totalLivingRooms = value;
                 break;
             case "Bed Rooms":
-                propertyRequest.totalBedRooms = changedVal;
+                propertyRequest.totalBedRooms = value;
                 break;
             case "Bath Rooms":
-                propertyRequest.totalBathRooms = changedVal;
+                propertyRequest.totalBathRooms = value;
                 break;
             case "External BathRooms":
-                propertyRequest.totalExternalBathRooms = changedVal;
+                propertyRequest.totalExternalBathRooms = value;
                 break;
         }
     }
@@ -123,14 +158,15 @@
             </svg>
         </button>
         <input
-            type="text"
+            type="number"
             id="{config.name.toLowerCase().replace(' ', '-')}-input"
             on:change={(e) =>
                 setRoomNumberBasedOnType(config.name, e.target.value)}
             data-input-counter
             data-input-counter-min={config.minCount}
             data-input-counter-max={config.maxCount}
-            value={config.defaultCount ? config.defaultCount : 1}
+            bind:value={roomInfo[roomKeyMap[config.name]]}
+            
             required
             class="bg-gray-50 border-x-0 border-gray-300 h-11 font-medium text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full pb-6 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         />
