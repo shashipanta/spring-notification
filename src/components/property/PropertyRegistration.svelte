@@ -258,7 +258,11 @@
           required
         />
       </div>
-      <Button type="submit" class="w-full">Register Property</Button>
+      {#if propertyRequest.id}
+        <Button type="submit" class="w-full">Update Property</Button>
+      {:else}
+        <Button type="submit" class="w-full">Register Property</Button>
+      {/if}
     </div>
   </form>
 </Section>
