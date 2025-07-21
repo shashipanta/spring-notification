@@ -1,9 +1,9 @@
-import type { Actions } from "./$types";
-import { z } from "zod";
+import { USER_ACCOUNT } from "$lib/api-routes";
 import { validationMessages } from "$lib/constants/ValidationMessages";
-import { postData } from "../../api";
-import { API_USER_ACCOUNT_AUTH } from "$lib/api-routes";
 import { redirect } from "@sveltejs/kit";
+import { z } from "zod";
+import { requestData } from "../../api";
+import type { Actions } from "./$types";
 
 console.log("+page.server.ts reloaded!");
 
@@ -39,7 +39,6 @@ export const actions = {
 
     try {
       registrationSchema.parse(formData);
-      console.log("successfull person");
     } catch (error: any) {
       console.log("Flatten error    : ", error.flatten());
 
@@ -52,14 +51,12 @@ export const actions = {
       };
     }
 
+    console.log("Registration URL : ", USER_ACCOUNT.REGISTER);
     // api to save user
-    let data = await postData(API_USER_ACCOUNT_AUTH + "register", formData, {});
+    let data = await requestData(USER_ACCOUNT.REGISTER, "POST", formData);
 
     if (data != null) {
       throw redirect(302, "/login");
-      return {
-        success: true,
-      };
     } else {
       return {
         success: false,

@@ -1,5 +1,4 @@
 import { USER_ACCOUNT } from "$lib/api-routes";
-import { fetchData } from "../../api";
 
 interface UserAccuntReq {
   username: string;
@@ -14,9 +13,8 @@ export const accountReq: UserAccuntReq = {
 };
 
 export const registerUser = (requestBody: UserAccuntReq) => {
-  let user_registration_uri = USER_ACCOUNT;
-
-  fetch(user_registration_uri, {
+  
+  fetch(USER_ACCOUNT.REGISTER, {
     method: "post",
     body: JSON.stringify(requestBody),
   })

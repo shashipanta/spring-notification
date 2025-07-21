@@ -5,10 +5,11 @@ export const BASE_URL = PUBLIC_SERVER_BASE_URL;
 export const API_PREFIX = "/api/v1/";
 
 // USER-ACCOUNTS
-export const _USER_ACCOUNT = BASE_URL + API_PREFIX + "user-accounts/";
+export const _USER_ACCOUNT = BASE_URL + API_PREFIX + "user-accounts";
 export const USER_ACCOUNT = {
     BASE: _USER_ACCOUNT,
-    DETAILS: _USER_ACCOUNT + "details",
+    DETAILS: _USER_ACCOUNT + "/details",
+    REGISTER: _USER_ACCOUNT + "/auth/register",
 }
 
 // OWNER

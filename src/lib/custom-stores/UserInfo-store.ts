@@ -2,6 +2,7 @@
 import { writable } from 'svelte/store';
 
 export type User = {
+  id: number;
   username: string;
   email: string;
   avatar?: string;
