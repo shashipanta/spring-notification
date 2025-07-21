@@ -1,5 +1,9 @@
 <script lang="ts">
-    import type { PropertyRegistrationRequest } from "$lib/global-types/PropertyTypes";
+    import {
+        Roomtype,
+        type PropertyRegistrationRequest,
+        type RoomsInfo,
+    } from "$lib/global-types/PropertyTypes";
 
     export let propertyRequest: PropertyRegistrationRequest;
 
@@ -15,7 +19,7 @@
         bedRooms: number;
         livingRooms: number;
         externalBathRooms: number;
-    }
+    };
 
     let buttonConfig = [
         {
@@ -44,12 +48,37 @@
         },
     ];
 
+    // Initialize roomInfo with default values from buttonConfig
     let roomInfo: RoomInfo = {
         bathRooms: buttonConfig[0].defaultCount,
         bedRooms: buttonConfig[1].defaultCount,
         livingRooms: buttonConfig[2].defaultCount,
         externalBathRooms: buttonConfig[3].defaultCount,
     };
+
+    if (propertyRequest != null && propertyRequest.id != null) {
+        propertyRequest?.rooms?.forEach((room) => {
+            switch (room.roomName) {
+                case Roomtype.LIVING_ROOM:
+                    roomInfo.livingRooms =
+                        room.totalRooms || buttonConfig[2].defaultCount;
+                    break;
+                case Roomtype.BED_ROOM:
+                    roomInfo.bedRooms =
+                        room.totalRooms || buttonConfig[1].defaultCount;
+                    break;
+                case Roomtype.BATH_ROOM:
+                    roomInfo.bathRooms =
+                        room.totalRooms || buttonConfig[0].defaultCount;
+                    break;
+                case Roomtype.EXTERNAL_BATHROOM:
+                    roomInfo.externalBathRooms =
+                        room.totalRooms || buttonConfig[3].defaultCount;
+                    break;
+            }
+        });
+    } else {
+    }
 
     // determine input type and assign right value to the request object
     /**
@@ -59,48 +88,30 @@
      * action {i, d, o} i: increase, d: decrease, o: direct input field changed
      */
     function determineRoomType(roomType: string, action: string) {
-        console.log(
-            "value passed : ",
-            roomType,
-            " action: ",
-            action,
-            "Room Info: ",
-            roomInfo,
-        );
+        const key = roomKeyMap[roomType];
+        const config = buttonConfig.find((c) => c.name === roomType);
+        if (!config) return;
+
+        const current = roomInfo[key];
+
+        if (action === "i" && current < config.maxCount) {
+            roomInfo[key] = current + 1;
+        } else if (action === "d" && current > config.minCount) {
+            roomInfo[key] = current - 1;
+        }
+
+        // Update propertyRequest
         switch (roomType) {
             case "Living Rooms":
-
-                roomInfo.livingRooms =
-                    action == "i"
-                        ? roomInfo.livingRooms + 1
-                        : roomInfo.livingRooms - 1;
                 propertyRequest.totalLivingRooms = roomInfo.livingRooms;
-                console.log(
-                    "Living rooms updated : ",
-                    roomInfo,
-                    "Property Request: ",
-                    propertyRequest,
-                );
                 break;
             case "Bed Rooms":
-                roomInfo.bedRooms =
-                    action == "i"
-                        ? roomInfo.bedRooms + 1
-                        : roomInfo.bedRooms - 1;
                 propertyRequest.totalBedRooms = roomInfo.bedRooms;
                 break;
             case "Bath Rooms":
-                roomInfo.bathRooms =
-                    action == "i"
-                        ? roomInfo.bathRooms + 1
-                        : roomInfo.bathRooms - 1;
                 propertyRequest.totalBathRooms = roomInfo.bathRooms;
                 break;
             case "External BathRooms":
-                roomInfo.externalBathRooms =
-                    action == "i"
-                        ? roomInfo.externalBathRooms + 1
-                        : roomInfo.externalBathRooms - 1;
                 propertyRequest.totalExternalBathRooms =
                     roomInfo.externalBathRooms;
                 break;
@@ -135,11 +146,15 @@
         <button
             type="button"
             id="decrement-button"
+            disabled={roomInfo[roomKeyMap[config.name]] <= config.minCount}
             on:click={(e) => determineRoomType(config.name, "d")}
             data-input-counter-decrement="{config.name
                 .toLowerCase()
                 .replace(' ', '-')}-input"
-            class="bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none"
+            class="bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none disabled:bg-gray-300 disabled:cursor-not-allowed"
+            title={roomInfo[roomKeyMap[config.name]] <= config.minCount
+                ? `Mininum ${config.minCount} reached`
+                : "Decrease number of rooms"}
         >
             <svg
                 class="w-3 h-3 text-gray-900 dark:text-white"
@@ -163,10 +178,9 @@
             on:change={(e) =>
                 setRoomNumberBasedOnType(config.name, e.target.value)}
             data-input-counter
-            data-input-counter-min={config.minCount}
-            data-input-counter-max={config.maxCount}
+            min={config.minCount}
+            max={config.maxCount}
             bind:value={roomInfo[roomKeyMap[config.name]]}
-            
             required
             class="bg-gray-50 border-x-0 border-gray-300 h-11 font-medium text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full pb-6 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         />
@@ -190,11 +204,15 @@
         <button
             type="button"
             id="increment-button"
+            disabled={roomInfo[roomKeyMap[config.name]] >= config.maxCount}
             on:click={(e) => determineRoomType(config.name, "i")}
             data-input-counter-increment="{config.name
                 .toLowerCase()
                 .replace(' ', '-')}-input"
-            class="bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-e-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none"
+            class="bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-e-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none disabled:bg-gray-300 disabled:cursor-not-allowed"
+            title={roomInfo[roomKeyMap[config.name]] >= config.maxCount
+                ? `Maximum ${config.maxCount} reached`
+                : "Increase number of rooms"}
         >
             <svg
                 class="w-3 h-3 text-gray-900 dark:text-white"
@@ -214,3 +232,17 @@
         </button>
     </div>
 {/each}
+
+<style>
+    /* Hide default arrows in number input for Chrome, Safari, Edge */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Hide default arrows in Firefox */
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+</style>
