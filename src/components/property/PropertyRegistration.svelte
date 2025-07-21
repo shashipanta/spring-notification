@@ -1,27 +1,30 @@
 <script lang="ts">
-  import type {
-    PropertyRegistrationRequest,
-    PropertyType,
-    FileType,
-  } from "$lib/global-types/PropertyTypes";
+  import { PROPERTY } from "$lib/api-routes";
   import propertyTypeStore from "$lib/custom-stores/property-stores";
   import {
-    Label,
-    Tooltip,
-    Input,
+    Roomtype,
+    type FileType,
+    type PropertyRegistrationRequest,
+    type PropertyType,
+    type RoomsInfo,
+  } from "$lib/global-types/PropertyTypes";
+  import { getLoggedInUserId } from "$lib/utils/user";
+  import { AxiosHeaders } from "axios";
+  import {
     Button,
+    Checkbox,
+    Fileupload,
+    Input,
+    Label,
     Select,
     Textarea,
-    Fileupload,
-    Checkbox,
+    Tooltip,
   } from "flowbite-svelte";
-  import { TrashBinOutline } from "flowbite-svelte-icons";
-  import GenericNumberGroups from "../number/GenericNumberGroups.svelte";
   import { Section } from "flowbite-svelte-blocks";
+  import { TrashBinOutline } from "flowbite-svelte-icons";
   import { onMount } from "svelte";
   import { postDataMultipart, requestDataMultipart } from "../../api";
-  import { PROPERTY } from "$lib/api-routes";
-  import { AxiosHeaders } from "axios";
+  import GenericNumberGroups from "../number/GenericNumberGroups.svelte";
 
   export let propertyRequest: PropertyRegistrationRequest;
   export let selectedFiles: FileType[] = [];
@@ -30,7 +33,39 @@
     console.log("Your Form : ", propertyRequest);
 
     //Todo: fetch owner id from spring boot logged In user
-    propertyRequest.ownerId = 1;
+
+    console.log(
+      "Property Ownership Requests : ",
+      propertyRequest.propertyOwnershipRequests,
+    );
+
+    propertyRequest.propertyOwnershipRequests =
+      propertyRequest.propertyOwnerships?.map((ownership) => ({
+        ...ownership,
+        id: ownership.id ?? { ownerId: null, propertyId: null }, // Ensure id is initialized
+        propertyId: propertyRequest.id || null, // Use existing ID if available
+        ownerId: getLoggedInUserId() ?? 0, // Use logged in user
+        userAccountId: getLoggedInUserId(), // This should be dynamically set based on the logged-in user
+        ownershipStartDate: ownership.ownershipStartDate ?? new Date(),
+        ownershipStatus: ownership.ownershipStatus ?? "PENDING",
+        edited: true,
+      })) ?? [
+        {
+          propertyId: null, // Use existing ID if available
+          ownerId: getLoggedInUserId() ?? 0,
+          userAccountId: getLoggedInUserId(), // This should be dynamically set based on the logged-in user
+          ownershipStartDate: new Date(),
+          ownershipStatus: "PENDING",
+          ownershipType: null,
+          ownershipPercentage: null,
+          ownershipEndDate: null,
+        },
+      ];
+
+    //room information
+    let rooms: RoomsInfo[] = generateRoomInfo(propertyRequest);
+    console.log("Rooms Info : ", rooms);
+    propertyRequest.rooms = rooms;
 
     // convert into form-data for this scenario
 
@@ -39,6 +74,7 @@
     let axiosMultipartHeader = new AxiosHeaders({
       "Content-Type": "multipart/form-data",
     });
+
     let multipartHeader = { "Content-Type": "multipart/form-data" };
 
     // Append files to FormData
@@ -82,19 +118,54 @@
     console.log(response);
   }
 
-  function objectToFormData(obj: AnyObject) {
-    const formData = new FormData();
-
+  function objectToFormData(
+    obj: any,
+    form = new FormData(),
+    parentKey = "",
+  ): FormData {
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        formData.append(key, obj[key]);
+      if (
+        !obj.hasOwnProperty(key) ||
+        obj[key] === undefined ||
+        obj[key] === null
+      ) {
+        continue;
+      }
+
+      const value = obj[key];
+      const formKey = parentKey ? `${parentKey}.${key}` : key;
+
+      if (value instanceof File) {
+        form.append(formKey, value);
+      } else if (Array.isArray(value)) {
+        value.forEach((item, index) => {
+          const arrayKey = `${formKey}[${index}]`;
+          if (
+            typeof item === "object" &&
+            !(item instanceof Date) &&
+            !(item instanceof File)
+          ) {
+            objectToFormData(item, form, arrayKey);
+          } else {
+            form.append(
+              arrayKey,
+              item instanceof Date ? item.toISOString() : item,
+            );
+          }
+        });
+      } else if (typeof value === "object" && !(value instanceof Date)) {
+        objectToFormData(value, form, formKey);
+      } else {
+        form.append(
+          formKey,
+          value instanceof Date ? value.toISOString() : value,
+        );
       }
     }
 
-    return formData;
+    return form;
   }
 
-  let selected: boolean;
   let propertyTypes: PropertyType[];
 
   // file logic
@@ -105,8 +176,6 @@
     accept: "image/*",
     multiple: "multiple",
   };
-
-  let multipartFiles: File[] = [];
 
   const handleFileChange = (event: Event) => {
     const input = event.target as HTMLInputElement;
@@ -134,7 +203,60 @@
   onMount(() => {
     console.log("Property  Type store : ", $propertyTypeStore);
     propertyTypes = $propertyTypeStore;
+    console.log("Logged in user ID: ", getLoggedInUserId());
   });
+
+  function generateRoomInfo(request: PropertyRegistrationRequest): RoomsInfo[] {
+    const updatedRoomsInfo: RoomsInfo[] = [];
+
+    // Step 1: Map existing rooms by roomName
+    const existingRoomsMap: Record<Roomtype, RoomsInfo> = {};
+    if (Array.isArray(request.rooms)) {
+      for (const room of request.rooms) {
+        if (room.roomName) {
+          existingRoomsMap[room.roomName] = room;
+        }
+      }
+    }
+
+    // Step 2: Define room types and their corresponding request keys
+    const roomTypes: {
+      key: keyof PropertyRegistrationRequest;
+      type: Roomtype;
+    }[] = [
+      { key: "totalBathRooms", type: Roomtype.BATH_ROOM },
+      { key: "totalBedRooms", type: Roomtype.BED_ROOM },
+      { key: "totalLivingRooms", type: Roomtype.LIVING_ROOM },
+      { key: "totalExternalBathRooms", type: Roomtype.EXTERNAL_BATHROOM },
+    ];
+
+    const updatedRoomTypes = new Set<Roomtype>();
+
+    for (const { key, type } of roomTypes) {
+      const count = Number(request[key]);
+
+      if (!isNaN(count)) {
+        updatedRoomTypes.add(type);
+        updatedRoomsInfo.push({
+          id: existingRoomsMap[type]?.id ?? null,
+          roomName: type,
+          totalRooms: count,
+        });
+      }
+    }
+
+    // Step 3: Retain untouched existing rooms
+    for (const [type, room] of Object.entries(existingRoomsMap) as [
+      Roomtype,
+      RoomsInfo,
+    ][]) {
+      if (!updatedRoomTypes.has(type)) {
+        updatedRoomsInfo.push(room);
+      }
+    }
+
+    return updatedRoomsInfo;
+  }
 </script>
 
 <Section name="crudcreateform">
@@ -142,7 +264,7 @@
     Add a new Property
   </h2>
   <form on:submit={handleSubmit} enctype="multipart/form-data">
-    <input type="hidden" name="ownerId" bind:value={propertyRequest.ownerId} />
+    <input type="hidden" name="id" bind:value={propertyRequest.id} />
     <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
       <div class="sm:col-span-2">
         <Label for="name" class="mb-2">Property Name</Label>
@@ -207,12 +329,15 @@
           required
         />
       </div>
-      <div class="sm:col-span-2">
-        <Label for="weight" class="mb-2">Additional Info</Label>
-        <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
-          <GenericNumberGroups bind:propertyRequest />
+      <!--  Additional Info -->
+      {#if propertyRequest.propertyType != "LAND"}
+        <div class="sm:col-span-2">
+          <Label for="weight" class="mb-2">Additional Info</Label>
+          <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
+            <GenericNumberGroups bind:propertyRequest />
+          </div>
         </div>
-      </div>
+      {/if}
 
       <div class="sm:col-span-2">
         <!-- Image files upload -->

@@ -5,7 +5,6 @@
 	// passed from +page.server.ts
 	export let form;
 
-	console.log("form : in page : ", form);
 
 	interface RegistrationValidationErrors {
 		username: string;
@@ -61,7 +60,6 @@
 			{/if}
 
 			<!-- <p class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium">Oops!</span> Username already taken!</p> -->
-		</div>
 		<div class="mb-5">
 			<label
 				for="email-address-icon"

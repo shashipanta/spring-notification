@@ -51,7 +51,7 @@ export const actions = {
       };
     }
 
-    console.log("Registration URL : ", USER_ACCOUNT.REGISTER);
+    // Registration URL logging removed for production
     // api to save user
     let data = await requestData(USER_ACCOUNT.REGISTER, "POST", formData);
 

@@ -4,21 +4,26 @@
   import PropertyRegistration from "../../../../components/property/PropertyRegistration.svelte";
 
   import propertyTypeStore from "$lib/custom-stores/property-stores.js";
-  import type { FileType, PropertyRegistrationRequest } from "$lib/global-types/PropertyTypes.js";
-    import { PROPERTY } from "$lib/api-routes";
+  import type {
+    FileType,
+    PropertyRegistrationRequest,
+  } from "$lib/global-types/PropertyTypes.js";
+  import { PROPERTY } from "$lib/api-routes";
+
+  // this is the data passed from the server
+  // it contains propertyMetaInfo and propertyData
+  // propertyMetaInfo contains information about property types, owners, etc.
+  // propertyData contains the actual data of the property if it is for edit case
+  // if it is for create case, propertyData will be null
+  export let data;
 
   let propertyType = [
     { value: 0, name: "United States" },
     { value: 1, name: "Canada" },
     { value: 2, name: "France" },
   ];
-  let requiredarr = [
-    { value: "us", name: "United States" },
-    { value: "ca", name: "Canada" },
-    { value: "fr", name: "France" },
-  ];
-  console.log("required ", propertyType);
 
+  console.log("required ", propertyType);
 
   let propertyTypeList: PropertyTypeSelect[] = [];
   let selectedFiles: FileType[] = [];
@@ -34,29 +39,29 @@
   });
 
   let propertyRequest: PropertyRegistrationRequest = {
-    id: "",
-    propertyTitle: null,
-    propertyType: null,
-    allocatedPrice: null,
-    pricePerUnit: null,
-    occupied: false,
-    totalRooms: 0,
-    addressType: "P",
-    wardNo: null,
-    streetName: "",
-    streetNameNp: "",
-    googleLocation: null,
-    totalBathRooms: null,
-    totalBedRooms: null,
-    totalLivingRooms: null,
-    totalExternalBathRooms: null,
-    imageFiles: [],
-    multipartFiles: [],
-    ownerId: null,
-    description: null,
+      id: "",
+      propertyTitle: null,
+      propertyType: null,
+      allocatedPrice: null,
+      pricePerUnit: null,
+      occupied: false,
+      totalRooms: 0,
+      addressType: "P",
+      wardNo: null,
+      streetName: "",
+      streetNameNp: "",
+      googleLocation: null,
+      totalBathRooms: null,
+      totalBedRooms: null,
+      totalLivingRooms: null,
+      totalExternalBathRooms: null,
+      imageFiles: [],
+      multipartFiles: [],
+      description: null,
+      propertyOwnershipRequests: []
   };
 
-  export let data;
+
   console.log("Data sent form server : ", data);
   let ownerResponses = data.propertyMetaInfo.ownerResponses;
 
@@ -93,11 +98,10 @@
     selectedFiles = propertyRequest.imageFiles;
 
     console.log("The server sent request object : ", propertyRequest);
-
   }
 
   console.log("owner responses : ", ownerResponses);
 </script>
 
 <!--Create Property side form  -->
-<PropertyRegistration bind:propertyRequest selectedFiles = {selectedFiles}/>
+<PropertyRegistration bind:propertyRequest {selectedFiles} />

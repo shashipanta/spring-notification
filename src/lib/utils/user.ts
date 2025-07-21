@@ -8,6 +8,5 @@ export function getLoggedInUser() {
 
 export function getLoggedInUserId() {
 	const loggedInUser = getLoggedInUser();
-	console.log("Logged in user: ", loggedInUser);
 	return loggedInUser ? loggedInUser.id : null;
 }
