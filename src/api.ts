@@ -1,6 +1,5 @@
 import { PUBLIC_SERVER_BASE_URL } from "$env/static/public";
 import type { GlobalApiResponse } from "$lib/api";
-import toast from "svelte-french-toast";
 import axios, { AxiosRequestHeaders, Method } from "axios";
 import toast from "svelte-french-toast";
 
@@ -27,7 +26,6 @@ export async function fetchData(endpoint: string) {
   const apiEndPoint = endpoint;
   try {
     console.log("Fetching Data : ", apiEndPoint);
-    console.log("Authorization header in common fetch function : ");
     // console.log("Request Body : ", fetch(endpoint));
     const response = await fetch(apiEndPoint, {
       credentials: "include",
@@ -36,9 +34,6 @@ export async function fetchData(endpoint: string) {
 
     // console.log("Data fetched from server : (json) : ", responseJson);
     console.log("Main Data inside : ", responseJson.data);
-
-    // const response: GlobalApiResponse = await axios_get(apiEndPoint);
-    // handleToast(responseJson.data);
 
     return responseJson.data;
   } catch (error) {
