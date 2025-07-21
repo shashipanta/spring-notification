@@ -1,4 +1,5 @@
 import { USER_ACCOUNT } from "$lib/api-routes";
+import { user } from "$lib/custom-stores/UserInfo-store";
 import { handleLoginRedirect } from "$lib/utils/routeUtils";
 import { redirect, type Handle } from "@sveltejs/kit";
 
@@ -32,11 +33,16 @@ export const handle: Handle = async ({ resolve, event }) => {
     });
     if (userInfo.ok) {
       const userInfoData = await userInfo.json();
+      console.log("User info data: ", userInfoData);
       const loggedUserInfo = {
+        id: userInfoData.data.userAccountId,
         username: userInfoData.data.username,
         email: userInfoData.data.email,
       }
       event.locals.user = loggedUserInfo
+      // write user info to store (for client-side access)
+      user.set(loggedUserInfo);
+      
     }
   }
 
