@@ -6,4 +6,8 @@ export default defineConfig({
   optimizeDeps: {
     include: ["src/globals/*.css"],
   },
+  // define: {
+  //   global: "globalThis",
+  // }
 });
+

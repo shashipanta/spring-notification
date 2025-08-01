@@ -15,6 +15,7 @@ const api = axios.create({
 
 
 /**
+ * @deprecated
  * This function fetches data from a given API endpoint.
  * It uses the axios to make a GET request (default) to the specified endpoint,
  * and returns the data in JSON format.

@@ -1,81 +1,112 @@
-<!-- Chat.svelte -->
-
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import SockJS from 'sockjs-client';
-    import Stomp from 'stompjs';
-  
-    let stompClient: Stomp.Client;
-    let username: string;
-    let messages: { sender: string; content: string }[] = [];
-    let message = '';
-  
-    onMount(() => {
-      initializeWebSocket();
-    });
-  
-    function initializeWebSocket() {
-      const socket = new SockJS('/ws');
-      stompClient = Stomp.over(socket);
-  
-      stompClient.connect({}, onConnected, onError);
-    }
-  
-    function onConnected() {
-      stompClient.subscribe('/topic/public', onMessageReceived);
-  
-      stompClient.send('/app/chat.addUser', {}, JSON.stringify({
-        sender: username,
-        type: 'JOIN'
-      }));
-    }
-  
-    function onMessageReceived(payload: Stomp.Message) {
-      const message = JSON.parse(payload.body) as { sender: string; content: string };
-      messages = [...messages, message];
-    }
-  
-    function sendMessage() {
-      stompClient.send('/app/chat.sendMessage', {}, JSON.stringify({
-        sender: username,
-        content: message,
-        type: 'CHAT'
-      }));
-      message = '';
-    }
+  import { type ChatMessage, wsService } from "$lib/service/WebSocketService";
+  import { getLoggedInUserId } from "$lib/utils/user";
+  import { onMount } from "svelte";
 
-    function disconnect() {
-      console.log("This should disconnect");
+  import { get } from "svelte/store";
+  import { user } from "$lib/custom-stores/UserInfo-store";
+  import { fetchData, requestData } from "../../api";
+
+  let messages: ChatMessage[] = [];
+  let message = "";
+
+  let scrollRef: HTMLDivElement;
+
+  let currentUserId = getLoggedInUserId();
+  let selectedGroupId: number | null = null;
+  let selectedReceiverId: number | null = 3;
+  let token = get(user)?.accessToken;
+
+  function handleIncoming(msg: any) {
+    messages = [...messages, msg];
+    scrollRef?.scrollTo({ top: scrollRef.scrollHeight, behavior: "smooth" });
+  }
+
+  async function fetchChatHistory() {
+    const res = await requestData(
+      `/api/v1/chats/history?userId=${4}&groupId=${selectedGroupId ?? ""}&limit=10`,
+    );
+    if (res.ok) {
+      const history = await res.json();
+      messages = history; // initialize messages with recent chat history
+      console.log(messages);
+    } else {
+      console.error("Failed to fetch chat history");
     }
-  
-    function onError(error: string) {
-      console.error('Error during WebSocket connection:', error);
-    }
-  </script>
-  
-  <!-- src/Chat.svelte -->
-<main>
-  <h1>WebSocket Chat with Svelte</h1>
+  }
 
-  <div>
-    <button on:click={disconnect}>Disconnect</button>
-  </div>
+  onMount(async () => {
+    currentUserId = getLoggedInUserId();
+    console.log("Current user ID:", currentUserId);
+    await fetchChatHistory();
+    token = get(user)?.accessToken;
+    console.log("Connecting to WebSocket with token:", token);
+    // todo: replace this with a way to get token
+    // const token = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjMsInN1YiI6InNoYXNoaUB5b3BtYWlsLmNvbSIsImlhdCI6MTc1MzcyOTk5MCwiZXhwIjoxNzU0NTkzOTkwfQ.4AVYlzfFUGhjBo_0YGbUCJv-NMEB9orH_nRLpiR6kCU"
+    wsService.connect(token, currentUserId, handleIncoming, selectedGroupId);
 
-  <div>
-    <label for="sender">Username:</label>
-    <input bind:value={username} type="text" id="sender" placeholder="Enter your username">
+    return () => {
+      wsService.disconnect();
+    };
+  });
 
-    <label for="message">Message:</label>
-    <input bind:value={message} type="text" id="message" placeholder="Type your message">
+  function sendMessage() {
+    if (!message.trim()) return;
+    console.log("Sending message:", message);
 
-    <button on:click={sendMessage}>Send</button>
-  </div>
+    let chatMessageRequest: ChatMessage = {
+      content: message,
+      senderId: getLoggedInUserId(),
+      groupId: selectedGroupId,
+      receiverId: selectedReceiverId,
+      timestamp: new Date().toISOString(),
+      type: selectedGroupId ? "GROUP" : "PRIVATE",
+    };
 
-  <div>
-    {#each messages as { id, sender, content }}
-      <Message {id} {sender} {content} />
+    console.log("Chat message request:", chatMessageRequest);
+
+    wsService.sendMessage(chatMessageRequest);
+
+    // Add the message locally immediately
+    handleIncoming(chatMessageRequest);
+  }
+</script>
+
+
+<div class="p-4 bg-white rounded-xl shadow max-w-xl mx-auto">
+  <h2 class="text-xl font-bold mb-3">Chat</h2>
+
+  <div
+    class="h-60 overflow-y-auto border rounded p-2 bg-gray-100 space-y-2"
+    bind:this={scrollRef}
+  >
+    {#each messages as msg (msg.id)}
+      <div class="bg-blue-100 p-2 rounded">
+        <strong>{msg.senderId === currentUserId ? "You" : msg.senderId}:</strong
+        >
+        <span>{msg.content}</span>
+      </div>
     {/each}
   </div>
-</main>
 
-  
+  <input
+    class="w-full border p-2 rounded mt-4"
+    bind:value={message}
+    placeholder="Type your message..."
+    on:keydown={(e) => e.key === "Enter" && sendMessage()}
+  />
+
+  <button
+    class="w-full mt-2 bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700"
+    on:click={sendMessage}
+  >
+    Send
+  </button>
+</div>
+
+<style>
+  input:focus {
+    outline: none;
+    border-color: #4299e1;
+  }
+</style>

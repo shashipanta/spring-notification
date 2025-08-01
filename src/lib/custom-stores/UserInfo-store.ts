@@ -6,6 +6,7 @@ export type User = {
   username: string;
   email: string;
   avatar?: string;
+  accessToken?: string;
 };
 
 export const user = writable<User | null>(null);

@@ -32,7 +32,7 @@
            <span class="inline-flex justify-center items-center px-2 ms-3 text-sm font-medium text-gray-800 bg-gray-200 rounded-full dark:bg-gray-700 dark:text-gray-300"> Pro </span>
          </svelte:fragment>
        </SidebarItem>
-       <SidebarItem label="Inbox" href="#" active={activeUrl === '/api/chat'}>
+       <SidebarItem label="Inbox" href="/api/chat" active={activeUrl === '/api/chat'}>
          <svelte:fragment slot="icon">
            <MailBoxSolid class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
          </svelte:fragment>
