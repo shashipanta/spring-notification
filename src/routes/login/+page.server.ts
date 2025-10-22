@@ -2,6 +2,7 @@ import { API_USER_ACCOUNT_AUTH, USER_ACCOUNT } from "$lib/api-routes.js";
 import { redirect } from "@sveltejs/kit";
 import { z } from "zod";
 import { user } from "$lib/custom-stores/UserInfo-store";
+import { get } from "svelte/store";
 
 const loginSchema = z.object({
   username: z.string().min(1).max(150).trim(),
@@ -57,6 +58,8 @@ export const actions = {
     });
 
     console.log("User store updated with login data:", user);
+    const currentUser = get(user);
+    console.log("Access token set in cookies:", currentUser ? currentUser.accessToken : null);
 
     const redirectTo = url.searchParams.get("redirectTo");
 

@@ -4,11 +4,14 @@ import SockJS from 'sockjs-client/dist/sockjs.min.js';
 export type MessageType = 'PRIVATE' | 'GROUP';
 
 export interface ChatMessage {
+	id: string;
 	senderId: number;
+	senderName?: string;
 	receiverId?: number;
+	receiverName?: string;
 	groupId?: number;
 	content: string;
-	timestamp?: string;
+	timestamp?: EpochTimeStamp;
 	type: MessageType;
 }
 
@@ -17,8 +20,17 @@ class WebSocketService {
 	private connected = false;
 
 	connect(token: string, userId: string, onMessage: (msg: ChatMessage) => void, groupId?: string) {
+
+		// guard connection
+		if (this.client && this.connected) {
+			console.warn('WebSocket is already connected');
+			return;
+		}
+
+		// initialize the STOMP client
+		// using SockJS for WebSocket fallback
 		this.client = new Client({
-			 brokerURL: `ws://localhost:8090/ws?token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyaXdhakB5b3BtYWlsLmNvbSIsInVzZXJJZCI6NCwiaWF0IjoxNzUzNzM2Nzg0LCJleHAiOjE3NTQ2MDA3ODR9.FcSYWPsO47P7dzoB6c3Wx07f__DYUvfAZXUFXzfSygo`,
+			 brokerURL: `ws://localhost:8090/ws`,
 			// webSocketFactory: () => new SockJS('http://localhost:8090/ws'),
 			connectHeaders: {
 				Authorization: `Bearer ${token}`

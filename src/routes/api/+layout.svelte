@@ -10,8 +10,10 @@
 
   // store the data sent from layout.server.ts into a store
   user.set({
-    username: data.user.username,
-    email: data.user.email,
+      username: data.user.username,
+      email: data.user.email,
+      id: data.user.id,
+      accessToken: data.user.accessToken,
   });
 </script>
 

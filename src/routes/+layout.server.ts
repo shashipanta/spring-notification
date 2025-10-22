@@ -6,6 +6,8 @@ export function load({ locals }) {
       id: locals?.user?.id,
       username: locals?.user?.username,
       email: locals?.user?.email,
+      accessToken: locals?.authToken,
+      avatar: locals?.user?.avatar,
     }
   }
 }

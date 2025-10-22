@@ -112,7 +112,7 @@ export async function postDataMultipart(
     } else {
       toast.error("An unexpected error occurred");
     }
-    
+
     throw error;
   }
 }
